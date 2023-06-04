@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tabu-bot", "tabu-bot.csproj", "{5FB93037-727C-45F6-8626-50E1677B00E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tabu-bot", "tabu-bot.Main\tabu-bot.Main.csproj", "{5FB93037-727C-45F6-8626-50E1677B00E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tabu-bot.DataAccess", "tabu-bot.DataAccess\tabu-bot.DataAccess.csproj", "{47E7E7D9-082F-41F6-AD3B-4214E3774ECD}"
 EndProject
