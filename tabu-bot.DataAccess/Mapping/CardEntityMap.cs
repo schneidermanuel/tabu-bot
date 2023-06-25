@@ -7,6 +7,7 @@ public class CardEntityMap : ClassMap<CardEntity>
 {
     public CardEntityMap()
     {
+        Table("card");
         Id(entity => entity.CardId, "cardId");
         Map(entity => entity.ContributerName, "contributerName");
         Map(entity => entity.Text, "text");
@@ -14,6 +15,6 @@ public class CardEntityMap : ClassMap<CardEntity>
         Map(entity => entity.Keyword2, "keyword2");
         Map(entity => entity.Keyword3, "keyword3");
         Map(entity => entity.Keyword4, "keyword4");
-        //References(entity => entity.Set, "cardSetId");
+        References(entity => entity.Set, "cardSetId");
     }
 }

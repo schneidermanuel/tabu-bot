@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -19,7 +18,10 @@ internal class BotSystem
         _slashCommands = new Dictionary<string, CommandContext>();
     }
 
-    private DiscordSocketClient _client = new();
+    private DiscordSocketClient _client = new(new DiscordSocketConfig
+    {
+        UseInteractionSnowflakeDate = false
+    });
 
     public async Task RunAsync(Configuration.Configuration configuration)
     {
@@ -85,7 +87,9 @@ internal class BotSystem
                 builder.AddOption(new SlashCommandOptionBuilder()
                     .WithName(parameter.ParameterName)
                     .WithDescription(parameter.ParameterDescription)
-                    .WithType(ApplicationCommandOptionType.String)
+                    .WithType(parameter.IsInt
+                        ? ApplicationCommandOptionType.Integer
+                        : ApplicationCommandOptionType.String)
                     .WithRequired(parameter.Required));
             }
 

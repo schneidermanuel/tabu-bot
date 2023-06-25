@@ -1,6 +1,6 @@
 ﻿namespace tabu_bot.DataAccess.Entity;
 
-internal class ChannelSet
+public class ChannelSetEntity
 {
     public virtual long ChannelSetId { get; set; }
     public virtual string ChannelId { get; set; }
