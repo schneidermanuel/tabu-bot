@@ -14,49 +14,29 @@ internal class TabuCommands : ICommandModule
         _repository = repository;
     }
 
-    [SlashCommand("create-tabu-set", "Creates a new Set of tabu cards")]
-    [Parameter("name", "the name of the set to create", true, false)]
-    public async Task CreateSetCommand(SocketSlashCommand slashCommand)
+    [SlashCommand("create-tabu-card", "creates a new tabu card")]
+    [Parameter("name", "name of the card", true, false)]
+    [Parameter("word1", "forbidden word 1", true, false)]
+    [Parameter("word2", "forbidden word 2", true, false)]
+    [Parameter("word3", "forbidden word 3", true, false)]
+    [Parameter("word4", "forbidden word 4", true, false)]
+    public async Task CreateCardAsync(SocketSlashCommand slashCommand)
     {
-        var name = (string)slashCommand.Data.Options.Single(option => option.Name == "name").Value;
-        var ownerId = slashCommand.User.Id;
-        var id = await _repository.CreateSetAsync(name, ownerId);
-        await slashCommand.RespondAsync($"Created new Card-Set '{name}' with Id '{id}'", ephemeral: true);
-    }
-
-    [SlashCommand("list-tabu-sets", "Lists your tabu sets")]
-    public async Task ShowMySetsAsync(SocketSlashCommand slashCommand)
-    {
-        var sets = await _repository.RetrieveMySetsAsync(slashCommand.User.Id);
-        var text = $"Tabu sets of '{slashCommand.User.Username}'\n\n";
-        text = sets.Aggregate(text, (current, set) => current + $"{set.SetId}) {set.Name}\n");
-        await slashCommand.RespondAsync(text, ephemeral: true);
-    }
-
-    [SlashCommand("assign-tabu-set", "ASsigns a existing Set to this channel")]
-    [Parameter("id", "the id of the set to assign", true, true)]
-    public async Task AssignSetToChannelAsync(SocketSlashCommand slashCommand)
-    {
-        if (slashCommand.User is not SocketGuildUser guildUser)
+        var name = (string)slashCommand.Data.Options.Single(x => x.Name == "name").Value;
+        var channelId = slashCommand.Channel.Id;
+        var canCreate = await _repository.CanCreateAsync(name, channelId);
+        if (!canCreate)
         {
-            await slashCommand.RespondAsync("This command can only be executed in a guild", ephemeral: true);
+            await slashCommand.RespondAsync(
+                "Unable to create card. It might already exist or no set is assigned to this channel", ephemeral: true);
             return;
         }
 
-        if (!guildUser.GuildPermissions.Administrator)
-        {
-            await slashCommand.RespondAsync("This command can only be executed by an administrator", ephemeral: true);
-        }
-
-        var channelId = slashCommand.Channel.Id;
-        var id = (long)slashCommand.Data.Options.Single(option => option.Name == "id").Value;
-        var set = await _repository.RetrieveSetByIdAsync(id);
-        var couldUnassign = await _repository.UnassignChannel(channelId);
-        await _repository.AssignSetAsync(id, channelId);
-        await slashCommand.RespondAsync($"Assigned set '{set.Name}' to this channel");
-        if (couldUnassign)
-        {
-            await slashCommand.FollowupAsync("The previously assigned set was removed", ephemeral: true);
-        }
+        var word1 = (string)slashCommand.Data.Options.Single(x => x.Name == "word1").Value;
+        var word2 = (string)slashCommand.Data.Options.Single(x => x.Name == "word2").Value;
+        var word3 = (string)slashCommand.Data.Options.Single(x => x.Name == "word3").Value;
+        var word4 = (string)slashCommand.Data.Options.Single(x => x.Name == "word4").Value;
+        await _repository.SaveCardAsync(name, channelId, slashCommand.User.Username, word1, word2, word3, word4);
+        await slashCommand.RespondAsync($"Created card '{name}'. Words: '{word1}', '{word2}', '{word3}', '{word4}'");
     }
 }

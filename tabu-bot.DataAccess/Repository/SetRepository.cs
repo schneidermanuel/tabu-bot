@@ -93,4 +93,45 @@ internal class SetRepository : ISetRepository
             return data;
         }
     }
+
+    public async Task<bool> CanCreateAsync(string name, ulong channelId)
+    {
+        using (var session = _sessionProvider.CreateSession())
+        {
+            var query = await session.Query<ChannelSetEntity>()
+                .Where(entity => entity.ChannelId == channelId.ToString())
+                .SingleOrDefaultAsync();
+            if (query == null)
+            {
+                return false;
+            }
+
+            var setEntity = query.CardSet;
+            return setEntity.Cards.All(card => card.Text != name);
+        }
+    }
+
+    public async Task SaveCardAsync(string name, ulong channelId, string userUsername, string word1, string word2,
+        string word3,
+        string word4)
+    {
+        using (var session = _sessionProvider.CreateSession())
+        {
+            var query = await session.Query<ChannelSetEntity>()
+                .Where(entity => entity.ChannelId == channelId.ToString())
+                .SingleAsync();
+            var card = new CardEntity
+            {
+                Text = name,
+                Keyword1 = word1,
+                Keyword2 = word2,
+                Keyword3 = word3,
+                Keyword4 = word4,
+                ContributerName = userUsername,
+                Set = query.CardSet
+            };
+            await session.SaveOrUpdateAsync(card);
+            await session.FlushAsync();
+        }
+    }
 }

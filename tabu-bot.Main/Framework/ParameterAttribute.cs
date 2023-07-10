@@ -1,5 +1,6 @@
 ﻿namespace tabu_bot.Framework;
 
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 internal class ParameterAttribute : Attribute
 {
     public string ParameterName { get; }
